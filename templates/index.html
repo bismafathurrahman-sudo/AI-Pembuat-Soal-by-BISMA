@@ -1,0 +1,642 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pembuat Soal by BISMA</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f6fc;
+            color: #172033;
+        }
+
+        header {
+            background: #101c35;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 22px;
+        }
+
+        header span {
+            color: #62b5ff;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #142b52, #1765a8);
+            color: white;
+            padding: 55px 7%;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            color: #dceaff;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 86%;
+            max-width: 1150px;
+            margin: 35px auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px #17203310;
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            margin-bottom: 20px;
+            font-size: 21px;
+        }
+
+        .upload {
+            border: 2px dashed #9db6d4;
+            border-radius: 12px;
+            padding: 35px 15px;
+            text-align: center;
+            background: #f7faff;
+            cursor: pointer;
+        }
+
+        .upload:hover {
+            border-color: #2475c5;
+            background: #eef6ff;
+        }
+
+        .upload input {
+            display: none;
+        }
+
+        .upload strong {
+            display: block;
+            color: #1765a8;
+            margin-bottom: 10px;
+        }
+
+        .upload p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        #fileName {
+            margin-top: 15px;
+            color: #1765a8;
+            font-size: 14px;
+        }
+
+        .settings {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 9px;
+            font-size: 14px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d5deeb;
+            border-radius: 8px;
+            background: white;
+            outline: none;
+        }
+
+        .modes {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .mode {
+            flex: 1;
+            min-width: 130px;
+            border: 1px solid #d5deeb;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            background: white;
+        }
+
+        .mode.active {
+            border: 2px solid #2475c5;
+            background: #eef6ff;
+            color: #1765a8;
+            font-weight: bold;
+        }
+
+        button {
+            border: none;
+            background: #1765a8;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        button:hover {
+            background: #104c83;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .generate {
+            width: 100%;
+            margin-top: 25px;
+            font-size: 16px;
+        }
+
+        .question {
+            border: 1px solid #e1e7f0;
+            padding: 20px;
+            border-radius: 11px;
+            margin: 18px 0;
+        }
+
+        .question h4 {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .option {
+            display: block;
+            padding: 11px;
+            margin: 8px 0;
+            background: #f6f8fc;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .option input {
+            margin-right: 8px;
+        }
+
+        .explanation {
+            display: none;
+            background: #edf7ff;
+            border-left: 4px solid #2475c5;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+
+        .correct {
+            color: #16834a;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #d33c3c;
+            font-weight: bold;
+        }
+
+        .result {
+            background: #eef6ff;
+            padding: 22px;
+            border-radius: 10px;
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #status {
+            margin-top: 15px;
+            text-align: center;
+            color: #1765a8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #718096;
+            font-size: 13px;
+        }
+
+        @media(max-width: 650px) {
+            .settings {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>AI <span>PEMBUAT SOAL by BISMA</span></h2>
+    <div>Smart Learning Platform</div>
+</header>
+
+<section class="hero">
+    <h1>Pembuat Soal Untuk Belajar & Ujian</h1>
+    <p>
+        Upload File Rangkumanmu dan Jadikan Soal Latihan Untuk Pembelajaranmu
+    </p>
+</section>
+
+<main class="container">
+
+    <section class="panel">
+        <h3>01. Upload materi</h3>
+
+        <label class="upload" for="file">
+            <strong>📁 Klik untuk memilih file materi</strong>
+            <p>Format PDF, DOCX, PPTX, XLSX, atau TXT</p>
+            <p>Maksimal 20 MB</p>
+            <input
+                type="file"
+                id="file"
+                accept=".pdf,.docx,.pptx,.xlsx,.txt"
+            >
+        </label>
+
+        <div id="fileName">Belum ada file dipilih</div>
+    </section>
+
+    <section class="panel">
+        <h3>02. Pengaturan Soal</h3>
+
+        <div class="settings">
+            <div>
+                <label for="jumlah">Jumlah Soal (0–100)</label>
+                <input
+                    type="number"
+                    id="jumlah"
+                    min="5"
+                    max="100"
+                    value="10"
+                >
+            </div>
+
+            <div>
+                <label for="kesulitan">Tingkat Kesulitan</label>
+                <select id="kesulitan">
+                    <option>Mudah</option>
+                    <option selected>Sedang</option>
+                    <option>Sulit</option>
+                    <option>Sangat Sulit</option>
+                    <option>Expert</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="tipe">Jenis Soal</label>
+                <select id="tipe">
+                    <option>Pilihan Ganda</option>
+                    <option>Benar atau Salah</option>
+                    <option>Esai</option>
+                </select>
+            </div>
+        </div>
+
+        <br>
+
+        <label>Mode Pembelajaran</label>
+
+        <div class="modes">
+            <div class="mode active" data-mode="Belajar">
+                📖<br>Mode Belajar
+            </div>
+
+            <div class="mode" data-mode="Ujian">
+                📝<br>Mode Ujian
+            </div>
+        </div>
+
+        <button class="generate" id="generateBtn" onclick="generateQuestions()">
+            ✨ AYO BUAT COYY
+        </button>
+
+        <div id="status"></div>
+    </section>
+
+    <section class="panel hidden" id="questionPanel">
+        <h3 id="quizTitle">Hasil Generate Soal</h3>
+
+        <div id="questions"></div>
+
+        <button id="finishBtn" onclick="finishQuiz()">
+            Selesaikan dan Periksa Jawaban
+        </button>
+
+        <div id="result"></div>
+    </section>
+
+</main>
+
+<footer>
+    AI Pembuat Soal by BISMA — Smart Learning Platform
+</footer>
+
+<script>
+    let questionsData = [];
+    let currentMode = "Belajar";
+    let quizFinished = false;
+
+    const fileInput = document.getElementById("file");
+
+    fileInput.addEventListener("change", function() {
+        const file = this.files[0];
+
+        document.getElementById("fileName").textContent =
+            file ? "File dipilih: " + file.name : "Belum ada file dipilih";
+    });
+
+    document.querySelectorAll(".mode").forEach(mode => {
+        mode.addEventListener("click", function() {
+            document.querySelectorAll(".mode").forEach(item =>
+                item.classList.remove("active")
+            );
+
+            this.classList.add("active");
+            currentMode = this.dataset.mode;
+        });
+    });
+
+    async function generateQuestions() {
+        const file = fileInput.files[0];
+        const jumlah = Number(document.getElementById("jumlah").value);
+
+        if (!file) {
+            alert("Silakan upload materi terlebih dahulu.");
+            return;
+        }
+
+        if (!Number.isInteger(jumlah) || jumlah < 5 || jumlah > 100) {
+            alert("Jumlah soal harus antara 5 sampai 100.");
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+        formData.append("jumlah", jumlah);
+        formData.append("kesulitan", document.getElementById("kesulitan").value);
+        formData.append("tipe", document.getElementById("tipe").value);
+        formData.append("mode", currentMode);
+
+        const button = document.getElementById("generateBtn");
+        const status = document.getElementById("status");
+
+        button.disabled = true;
+        status.textContent = "⏳ AI sedang membaca materi dan membuat soal...";
+
+        document.getElementById("questionPanel").classList.add("hidden");
+        document.getElementById("result").innerHTML = "";
+
+        try {
+            const response = await fetch("/api/generate", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.detail || "Gagal membuat soal.");
+            }
+
+            questionsData = result.data.questions || [];
+
+            if (!questionsData.length) {
+                throw new Error("AI tidak menghasilkan soal.");
+            }
+
+            quizFinished = false;
+            renderQuestions();
+
+            document.getElementById("quizTitle").textContent =
+                result.data.judul || "Hasil Generate Soal";
+
+            document.getElementById("questionPanel").classList.remove("hidden");
+
+            document.getElementById("finishBtn").style.display =
+                currentMode === "Ujian" ? "inline-block" : "none";
+
+            status.textContent = "✅ Berhasil membuat " + questionsData.length + " soal.";
+
+            document.getElementById("questionPanel").scrollIntoView({
+                behavior: "smooth"
+            });
+
+        } catch (error) {
+            status.textContent = "❌ " + error.message;
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions");
+        container.innerHTML = "";
+
+        questionsData.forEach((question, index) => {
+            const div = document.createElement("div");
+            div.className = "question";
+
+            const title = document.createElement("h4");
+            title.textContent = `${index + 1}. ${question.question}`;
+            div.appendChild(title);
+
+            if (question.options && Object.keys(question.options).length) {
+                Object.entries(question.options).forEach(([key, value]) => {
+                    const label = document.createElement("label");
+                    label.className = "option";
+
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = "question_" + index;
+                    radio.value = key;
+
+                    if (currentMode === "Belajar") {
+                        radio.addEventListener("change", () => {
+                            showExplanation(index);
+                        });
+                    }
+
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(key + ". " + value));
+                    div.appendChild(label);
+                });
+            } else {
+                const textarea = document.createElement("textarea");
+                textarea.id = "essay_" + index;
+                textarea.rows = 3;
+                textarea.style.width = "100%";
+                textarea.style.padding = "12px";
+                textarea.placeholder = "Tulis jawaban kamu...";
+                div.appendChild(textarea);
+            }
+
+            const explanation = document.createElement("div");
+            explanation.className = "explanation";
+            explanation.id = "explanation_" + index;
+
+            div.appendChild(explanation);
+
+            container.appendChild(div);
+        });
+    }
+
+    function showExplanation(index) {
+        if (currentMode !== "Belajar") return;
+
+        const question = questionsData[index];
+        const selected = document.querySelector(
+            `input[name="question_${index}"]:checked`
+        );
+
+        if (!selected) return;
+
+        const correct = selected.value === question.answer;
+        const explanation = document.getElementById("explanation_" + index);
+
+        explanation.style.display = "block";
+        explanation.innerHTML = `
+            <strong class="${correct ? "correct" : "incorrect"}">
+                ${correct ? "✓ Jawaban Benar" : "✗ Jawaban Belum Tepat"}
+            </strong>
+            <p style="margin-top:8px">
+                Jawaban benar: ${question.answer}
+            </p>
+            <p style="margin-top:8px">
+                ${question.explanation}
+            </p>
+        `;
+    }
+
+    async function finishQuiz() {
+        if (quizFinished) return;
+
+        const answers = {};
+
+        questionsData.forEach((question, index) => {
+            const selected = document.querySelector(
+                `input[name="question_${index}"]:checked`
+            );
+
+            if (selected) {
+                answers[index] = selected.value;
+            } else {
+                const essay = document.getElementById("essay_" + index);
+                if (essay) answers[index] = essay.value.trim();
+            }
+        });
+
+        if (Object.keys(answers).length < questionsData.length) {
+            if (!confirm("Masih ada soal yang belum dijawab. Tetap periksa hasil?")) {
+                return;
+            }
+        }
+
+        const button = document.getElementById("finishBtn");
+        button.disabled = true;
+        button.textContent = "Memeriksa jawaban...";
+
+        try {
+            const response = await fetch("/api/evaluate", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    questions: questionsData,
+                    answers: answers
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.detail || "Gagal memeriksa jawaban.");
+            }
+
+            quizFinished = true;
+
+            document.getElementById("result").innerHTML = `
+                <div class="result">
+                    <h3>Hasil Ujian</h3>
+                    <h1>${result.score}</h1>
+                    <p>Nilai: ${result.score} / 100</p>
+                    <p>Jawaban benar: ${result.correct}</p>
+                    <p>Jawaban salah: ${result.incorrect}</p>
+                    <p>Total soal: ${result.total}</p>
+                </div>
+            `;
+
+            result.results.forEach((item, index) => {
+                const explanation = document.getElementById("explanation_" + index);
+
+                if (explanation) {
+                    explanation.style.display = "block";
+                    explanation.textContent =
+                        "Jawaban kamu: " + (item.user_answer || "Tidak dijawab") +
+                        " | Jawaban benar: " + item.correct_answer +
+                        " | " + item.explanation;
+                }
+            });
+
+            button.style.display = "none";
+
+            document.getElementById("result").scrollIntoView({
+                behavior: "smooth"
+            });
+
+        } catch (error) {
+            alert(error.message);
+            button.disabled = false;
+            button.textContent = "Selesaikan dan Periksa Jawaban";
+        }
+    }
+</script>
+
+</body>
+</html>

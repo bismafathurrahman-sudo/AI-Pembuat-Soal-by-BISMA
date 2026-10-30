@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+openai
+python-dotenv
+python-multipart
+openpyxl
+python-pptx
+PyMuPDF
+python-docx
+jinja2
